@@ -497,6 +497,9 @@ libvirt_imagebackend_opts = [
                help='Discard option for nova managed disks. Need'
                     ' Libvirt(1.0.6) Qemu1.5 (raw format) Qemu1.6(qcow2'
                     ' format)'),
+    cfg.BoolOpt('force_xen_phy',
+                default=False,
+                help='Force using of PHY driver in Xen'),
 ]
 
 libvirt_imagecache_opts = [
