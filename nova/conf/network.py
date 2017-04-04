@@ -703,6 +703,30 @@ Related options:
 """),
 ]
 
+freebsd_net_opts = [
+    cfg.StrOpt("freebsdnet_interface_driver",
+            default="nova.network.freebsd.FreeBSDBridgeInterfaceDriver",
+            help="""
+This is the class used as the ethernet device driver for freebsdnet bridge
+operations. The default value should be all you need for most cases, but if you
+wish to use a customized class, set this option to the full dot-separated
+import path for that class.
+
+Possible values:
+
+    Any string representing a dot-separated class path that Nova can import.
+"""),
+    cfg.StrOpt("freebsdnet_ovs_integration_bridge",
+            default="br-int",
+            help="""
+The name of the Open vSwitch bridge that is used with freebsdnet when connecting
+with Open vSwitch."
+
+Possible values:
+
+    Any string representing a valid bridge name.
+"""),
+]
 
 ldap_dns_opts = [
     cfg.StrOpt('ldap_dns_url',
@@ -758,12 +782,13 @@ rpcapi_opts = [
                      'some rpc network calls will be sent directly to host.'),
 ]
 
-ALL_DEFAULT_OPTS = (linux_net_opts + network_opts + ldap_dns_opts
+ALL_DEFAULT_OPTS = (linux_net_opts + freebsd_net_opts + network_opts + ldap_dns_opts
                    + rpcapi_opts + driver_opts)
 
 
 def register_opts(conf):
     conf.register_opts(linux_net_opts)
+    conf.register_opts(freebsd_net_opts)
     conf.register_opts(network_opts)
     conf.register_opts(ldap_dns_opts)
     conf.register_opts(driver_opts)
