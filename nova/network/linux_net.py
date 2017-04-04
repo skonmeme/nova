@@ -1898,3 +1898,7 @@ def set_vf_interface_vlan(pci_addr, mac_addr, vlan=0):
                   port_state,
                   run_as_root=True,
                   check_exit_code=exit_code)
+
+
+def get_firewall_manager():
+    return iptables_manager
