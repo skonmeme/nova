@@ -194,7 +194,8 @@ class FloatingIPList(obj_base.ObjectListBase, obj_base.NovaObject):
     def get_by_project(cls, context, project_id):
         db_floatingips = db.floating_ip_get_all_by_project(context, project_id)
         return obj_base.obj_make_list(context, cls(context),
-                                      objects.FloatingIP, db_floatingips)
+                                      objects.FloatingIP, db_floatingips,
+                                      expected_attrs=['fixed_ip'])
 
     @obj_base.remotable_classmethod
     def get_by_fixed_address(cls, context, fixed_address):
