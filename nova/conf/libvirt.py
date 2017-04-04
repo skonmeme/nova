@@ -470,6 +470,9 @@ events`, refer https://libvirt.org/formatdomain.html#elementsPerf .
     None
 
 """),
+    cfg.BoolOpt('online_cpu_tracking',
+                default=True,
+                help='Enable online cpu tracking'),
 ]
 
 libvirt_imagebackend_opts = [

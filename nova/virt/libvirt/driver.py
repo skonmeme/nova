@@ -5215,11 +5215,12 @@ class LibvirtDriver(driver.ComputeDriver):
 
         cells = []
         allowed_cpus = hardware.get_vcpu_pin_set()
-        online_cpus = self._host.get_online_cpus()
-        if allowed_cpus:
-            allowed_cpus &= online_cpus
-        else:
-            allowed_cpus = online_cpus
+        if CONF.libvirt.online_cpu_tracking:
+            online_cpus = self._host.get_online_cpus()
+            if allowed_cpus:
+                allowed_cpus &= online_cpus
+            else:
+                allowed_cpus = online_cpus
 
         def _get_reserved_memory_for_cell(self, cell_id, page_size):
             cell = self._reserved_hugepages.get(cell_id, {})
@@ -5232,8 +5233,11 @@ class LibvirtDriver(driver.ComputeDriver):
                                         if cpu.siblings else ()
                                       for cpu in cell.cpus)
                                   ))
-            cpuset &= allowed_cpus
-            siblings = [sib & allowed_cpus for sib in siblings]
+            if CONF.libvirt.online_cpu_tracking or allowed_cpus:
+                cpuset &= allowed_cpus
+                siblings = [sib & allowed_cpus for sib in siblings]
+
+
             # Filter out singles and empty sibling sets that may be left
             siblings = [sib for sib in siblings if len(sib) > 1]
 
