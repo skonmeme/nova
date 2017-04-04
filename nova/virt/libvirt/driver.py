@@ -4350,7 +4350,7 @@ class LibvirtDriver(driver.ComputeDriver):
 
     def _create_consoles(self, virt_type, guest, instance, flavor, image_meta,
                          caps):
-        if virt_type in ("qemu", "kvm"):
+        if virt_type in ("qemu", "kvm", "xen"):
             # Create the serial console char devices
             self._create_serial_console_devices(guest, instance, flavor,
                                                 image_meta)
