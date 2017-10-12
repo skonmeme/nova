@@ -623,6 +623,9 @@ Possible values:
   https://libvirt.org/html/libvirt-libvirt-domain.html ,
   which you may need to search key words ``VIR_PERF_PARAM_*``
 """),
+#    cfg.BoolOpt('online_cpu_tracking',
+#                default=True,
+#                help='Enable online cpu tracking'),
 ]
 
 libvirt_imagebackend_opts = [
@@ -670,6 +673,20 @@ Requires:
 * Libvirt >= 1.0.6
 * Qemu >= 1.5 (raw format)
 * Qemu >= 1.6 (qcow2 format)
+"""),
+    cfg.StrOpt('images_xen_driver',
+               default='default',
+               choices=('phy', 'default'),
+               help="""
+Xen supports the following drivers: "tap", "tap2", "phy", "file", or "qemu", 
+being "qemu" the preferred one. The driver is automatically found with 
+'default' option, however "phy" driver could be forced with 'phy' option, 
+which is required on FreeBSD 11.
+
+Possible values:
+
+* default - find driver automatically
+* phy  - force to "phy" driver
 """),
 ]
 

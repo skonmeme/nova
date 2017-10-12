@@ -136,7 +136,7 @@ def pick_disk_driver_name(hypervisor_version, is_block_dev=False):
     :returns: driver_name or None
     """
     if CONF.libvirt.virt_type == "xen":
-        if is_block_dev:
+        if is_block_dev or CONF.libvirt.images_xen_driver == 'phy':
             return "phy"
         else:
             # 4002000 == 4.2.0

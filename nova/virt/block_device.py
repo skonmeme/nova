@@ -243,7 +243,12 @@ class DriverVolumeBlockDevice(DriverBlockDevice):
             {k: v for k, v in self._bdm_obj.items()
              if k in self._new_fields | set(['delete_on_termination'])}
         )
-        self['mount_device'] = self._bdm_obj.device_name
+        #self['mount_device'] = self._bdm_obj.device_name
+        # xen should be treated with default options?
+        device_name = self._bdm_obj.device_name
+        if self['disk_bus'] == 'xen':
+            device_name = device_name.replace("/dev/vd", "/dev/xvd")
+        self['mount_device'] = device_name        
         try:
             self['connection_info'] = jsonutils.loads(
                 self._bdm_obj.connection_info)

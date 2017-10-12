@@ -4584,19 +4584,23 @@ class LibvirtDriver(driver.ComputeDriver):
         #    7 |       yes |       yes |      no | see case 1
         #    8 |       yes |       yes |     yes | tcp with logd
         #    * exception: virt_type "parallels" doesn't create a device
+        #    * addition: xen virt_type is treated separately
         if virt_type == 'parallels':
             pass
-        elif virt_type not in ("qemu", "kvm"):
+        elif virt_type not in ("qemu", "kvm", "xen"):
             log_path = self._get_console_log_path(instance)
             self._create_pty_device(guest_cfg,
                                     vconfig.LibvirtConfigGuestConsole,
                                     log_path=log_path)
-        elif (virt_type in ("qemu", "kvm") and
+        elif (virt_type in ("qemu", "kvm", "xen") and
                   self._is_s390x_guest(image_meta)):
             self._create_consoles_s390x(guest_cfg, instance,
                                         flavor, image_meta)
         elif virt_type in ("qemu", "kvm"):
             self._create_consoles_qemu_kvm(guest_cfg, instance,
+                                        flavor, image_meta)
+        elif virt_type in ("xen"):
+            self._create_consoles_xen(guest_cfg, instance,
                                         flavor, image_meta)
 
     def _is_s390x_guest(self, image_meta):
@@ -4617,6 +4621,9 @@ class LibvirtDriver(driver.ComputeDriver):
         else:
             self._create_file_device(guest_cfg, instance, char_dev_cls)
         self._create_pty_device(guest_cfg, char_dev_cls, log_path=log_path)
+
+    def _create_consoles_xen(self, guest_cfg, instance, flavor, image_meta):
+        self._create_consoles_qemu_kvm(guest_cfg, instance, flavor, image_meta)
 
     def _create_consoles_s390x(self, guest_cfg, instance, flavor, image_meta):
         char_dev_cls = vconfig.LibvirtConfigGuestConsole
@@ -5618,6 +5625,12 @@ class LibvirtDriver(driver.ComputeDriver):
 
         cells = []
         allowed_cpus = hardware.get_vcpu_pin_set()
+        #if CONF.libvirt.online_cpu_tracking:
+        #    online_cpus = self._host.get_online_cpus()
+        #    if allowed_cpus:
+        #        allowed_cpus &= online_cpus
+        #    else:
+        #        allowed_cpus = online_cpus
         online_cpus = self._host.get_online_cpus()
         if allowed_cpus:
             allowed_cpus &= online_cpus
@@ -5635,6 +5648,9 @@ class LibvirtDriver(driver.ComputeDriver):
                                         if cpu.siblings else ()
                                       for cpu in cell.cpus)
                                   ))
+            #if CONF.libvirt.online_cpu_tracking or allowed_cpus:
+            #    cpuset &= allowed_cpus
+            #    siblings = [sib & allowed_cpus for sib in siblings]
             cpuset &= allowed_cpus
             siblings = [sib & allowed_cpus for sib in siblings]
             # Filter out singles and empty sibling sets that may be left
